@@ -25,6 +25,7 @@ class RegisterScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       TextFormField(
+                        textCapitalization: TextCapitalization.sentences,
                         decoration: const InputDecoration(
                           hintText: 'Имя',
                           hintStyle: TextStyle(fontSize: 16),
@@ -34,6 +35,7 @@ class RegisterScreen extends StatelessWidget {
                         height: 28,
                       ),
                       TextFormField(
+                        textCapitalization: TextCapitalization.sentences,
                         decoration: const InputDecoration(
                           hintText: 'Фамилия',
                           hintStyle: TextStyle(fontSize: 16),
@@ -43,6 +45,7 @@ class RegisterScreen extends StatelessWidget {
                         height: 28,
                       ),
                       TextFormField(
+                        textCapitalization: TextCapitalization.sentences,
                         decoration: const InputDecoration(
                           hintText: 'e-mail',
                           hintStyle: TextStyle(fontSize: 16),
@@ -52,6 +55,7 @@ class RegisterScreen extends StatelessWidget {
                         height: 28,
                       ),
                       TextFormField(
+                        textCapitalization: TextCapitalization.sentences,
                         keyboardType: TextInputType.number,
                         decoration: const InputDecoration(
                           hintText: 'Телефон',
@@ -62,6 +66,7 @@ class RegisterScreen extends StatelessWidget {
                   )),
               Expanded(
                 child: Align(
+                  alignment: Alignment.bottomCenter,
                   child: Container(
                     child: RaisedButton(
                       onPressed: () {},
@@ -71,9 +76,8 @@ class RegisterScreen extends StatelessWidget {
                       ),
                       color: Theme.of(context).primaryColor,
                     ),
-                    margin: const EdgeInsets.fromLTRB(0, 0, 0, 45),
+                    margin: const EdgeInsets.fromLTRB(0, 28, 0, 45),
                   ),
-                  alignment: Alignment.bottomCenter,
                 ),
               ),
             ],
