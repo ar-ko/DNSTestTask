@@ -4,5 +4,6 @@ class RegisterData {
   String phone;
   String email;
 
-  RegisterData(this.firstName, this.lastName, this.phone, this.email);
+  RegisterData({this.firstName, this.lastName, this.phone, this.email});
+
 }
