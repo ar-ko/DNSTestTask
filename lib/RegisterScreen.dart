@@ -18,6 +18,24 @@ class RegisterScreenState extends State<RegisterScreen> {
 
   final _formKey = GlobalKey<FormState>();
 
+  String validateMobile(String value) {
+// Indian Mobile number are of 10 digit only
+    if (value.length != 11 && value.isNotEmpty)
+      return 'Номер должен состоять из 11 цифр';
+    else
+      return null;
+  }
+
+  String validateEmail(String value) {
+    Pattern pattern =
+        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
+    RegExp regex = new RegExp(pattern);
+    if (!regex.hasMatch(value) && value.isNotEmpty)
+      return 'Введите корректный email';
+    else
+      return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -53,15 +71,17 @@ class RegisterScreenState extends State<RegisterScreen> {
     return Column(
       children: [
         TextFormField(
+          autovalidate: true,
           controller: _firstNameController,
+          keyboardType: TextInputType.text,
           textCapitalization: TextCapitalization.sentences,
           decoration: const InputDecoration(
             hintText: 'Имя',
             hintStyle: TextStyle(fontSize: 16),
           ),
           validator: (value) {
-            if (value.isEmpty) {
-              return 'Please enter some text';
+            if (value.length < 2 && value.isNotEmpty) {
+              return 'Введите свое имя';
             }
             return null;
           },
@@ -70,15 +90,17 @@ class RegisterScreenState extends State<RegisterScreen> {
           height: 28,
         ),
         TextFormField(
+          autovalidate: true,
           controller: _lastNameController,
+          keyboardType: TextInputType.text,
           textCapitalization: TextCapitalization.sentences,
           decoration: const InputDecoration(
             hintText: 'Фамилия',
             hintStyle: TextStyle(fontSize: 16),
           ),
           validator: (value) {
-            if (value.isEmpty) {
-              return 'Please enter some text';
+            if (value.length < 2 && value.isNotEmpty) {
+              return 'Введите свою фамилию';
             }
             return null;
           },
@@ -87,35 +109,28 @@ class RegisterScreenState extends State<RegisterScreen> {
           height: 28,
         ),
         TextFormField(
+          autovalidate: true,
           controller: _emailController,
+          keyboardType: TextInputType.emailAddress,
           decoration: const InputDecoration(
             hintText: 'E-mail',
             hintStyle: TextStyle(fontSize: 16),
           ),
-          validator: (value) {
-            if (value.isEmpty) {
-              return 'Please enter some text';
-            }
-            return null;
-          },
+          validator: validateEmail,
         ),
         SizedBox(
           height: 28,
         ),
         TextFormField(
+          autovalidate: true,
           controller: _phoneController,
           textCapitalization: TextCapitalization.sentences,
-          keyboardType: TextInputType.number,
+          keyboardType: TextInputType.phone,
           decoration: const InputDecoration(
             hintText: 'Телефон',
             hintStyle: TextStyle(fontSize: 16),
           ),
-          validator: (value) {
-            if (value.isEmpty) {
-              return 'Please enter some text';
-            }
-            return null;
-          },
+          validator: validateMobile,
         ),
       ],
     );
