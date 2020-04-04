@@ -1,7 +1,11 @@
-import 'package:dns_test_task/RegisterData.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
+
+import 'model/RegisterData.dart';
+import 'model/PhoneTextInputFormatter.dart';
+import 'model/ValidateForm.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -17,24 +21,12 @@ class RegisterScreenState extends State<RegisterScreen> {
   final _phoneController = TextEditingController();
 
   final _formKey = GlobalKey<FormState>();
+  final _mobileFormatter = PhoneTextInputFormatter();
+  final _validateForm = ValidateForm();
 
-  String validateMobile(String value) {
-// Indian Mobile number are of 10 digit only
-    if (value.length != 11 && value.isNotEmpty)
-      return 'Номер должен состоять из 11 цифр';
-    else
-      return null;
-  }
-
-  String validateEmail(String value) {
-    Pattern pattern =
-        r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = new RegExp(pattern);
-    if (!regex.hasMatch(value) && value.isNotEmpty)
-      return 'Введите корректный email';
-    else
-      return null;
-  }
+  final focusLastName = FocusNode();
+  final focusEmail = FocusNode();
+  final focusPhone = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -79,17 +71,17 @@ class RegisterScreenState extends State<RegisterScreen> {
             hintText: 'Имя',
             hintStyle: TextStyle(fontSize: 16),
           ),
-          validator: (value) {
-            if (value.length < 2 && value.isNotEmpty) {
-              return 'Введите свое имя';
-            }
-            return null;
+          validator: _validateForm.validateFirsttName,
+          textInputAction: TextInputAction.next,
+          onFieldSubmitted: (v) {
+            FocusScope.of(context).requestFocus(focusLastName);
           },
         ),
         SizedBox(
           height: 28,
         ),
         TextFormField(
+          focusNode: focusLastName,
           autovalidate: true,
           controller: _lastNameController,
           keyboardType: TextInputType.text,
@@ -98,17 +90,17 @@ class RegisterScreenState extends State<RegisterScreen> {
             hintText: 'Фамилия',
             hintStyle: TextStyle(fontSize: 16),
           ),
-          validator: (value) {
-            if (value.length < 2 && value.isNotEmpty) {
-              return 'Введите свою фамилию';
-            }
-            return null;
+          validator: _validateForm.validateLastName,
+          textInputAction: TextInputAction.next,
+          onFieldSubmitted: (v) {
+            FocusScope.of(context).requestFocus(focusEmail);
           },
         ),
         SizedBox(
           height: 28,
         ),
         TextFormField(
+          focusNode: focusEmail,
           autovalidate: true,
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
@@ -116,12 +108,17 @@ class RegisterScreenState extends State<RegisterScreen> {
             hintText: 'E-mail',
             hintStyle: TextStyle(fontSize: 16),
           ),
-          validator: validateEmail,
+          validator: _validateForm.validateEmail,
+          textInputAction: TextInputAction.next,
+          onFieldSubmitted: (v) {
+            FocusScope.of(context).requestFocus(focusPhone);
+          },
         ),
         SizedBox(
           height: 28,
         ),
         TextFormField(
+          focusNode: focusPhone,
           autovalidate: true,
           controller: _phoneController,
           textCapitalization: TextCapitalization.sentences,
@@ -130,7 +127,15 @@ class RegisterScreenState extends State<RegisterScreen> {
             hintText: 'Телефон',
             hintStyle: TextStyle(fontSize: 16),
           ),
-          validator: validateMobile,
+          validator: _validateForm.validateMobile,
+          //maxLength: 15,
+          inputFormatters: <TextInputFormatter>[
+            WhitelistingTextInputFormatter.digitsOnly,
+            _mobileFormatter,
+          ],
+          onFieldSubmitted: (v) {
+            _buttonPressed(_formKey);
+          },
         ),
       ],
     );
@@ -163,7 +168,7 @@ class RegisterScreenState extends State<RegisterScreen> {
           lastName: _lastNameController.text,
           email: _emailController.text,
           phone: _phoneController.text);
-
+      print(_phoneController.text);
       httpPost(RegisterData user) async {
         var response = await http.post(
           'https://vacancy.dns-shop.ru/api/candidate/token',
