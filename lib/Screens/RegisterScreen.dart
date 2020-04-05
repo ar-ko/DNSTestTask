@@ -1,11 +1,14 @@
+import 'package:dns_test_task/Network/NetworkService.dart';
+import 'package:dns_test_task/Screens/SendingDataScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 
-import 'model/RegisterData.dart';
-import 'model/PhoneTextInputFormatter.dart';
-import 'model/ValidateForm.dart';
+import '../Models/UserData.dart';
+import '../Models/PhoneTextInputFormatter.dart';
+import '../Models/ValidateForm.dart';
+import '../Models/ServerResponse.dart';
+import '../Network/NetworkService.dart';
+import '../Models/ScreenArguments.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -163,32 +166,33 @@ class RegisterScreenState extends State<RegisterScreen> {
 
   void _buttonPressed(GlobalKey<FormState> _formKey) {
     if (_formKey.currentState.validate()) {
-      RegisterData user = new RegisterData(
+      UserData user = new UserData(
           firstName: _firstNameController.text,
           lastName: _lastNameController.text,
           email: _emailController.text,
           phone: _phoneController.text);
-      print(_phoneController.text);
-      httpPost(RegisterData user) async {
-        var response = await http.post(
-          'https://vacancy.dns-shop.ru/api/candidate/token',
-          body: jsonEncode({
-            "firstName": user.firstName,
-            "lastName": user.lastName,
-            "phone": user.phone,
-            "email": user.email
-          }),
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8 ',
-          },
-        );
 
-        var kek = json.decode(utf8.decode(response.bodyBytes));
-        print(kek);
-        print('StatusCode: ${response.statusCode}');
+      void _getApiKey() async {
+        var json = await NetworkService().getKey(user);
+        var response = ServerResponse.fromJson(json);
+
+        if (response.code == 0) {
+          /*Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => SendingDataScreen()),
+          );*/
+          Navigator.pushNamed(
+            context,
+            SendingDataScreen.routeName,
+            arguments: ScreenArguments(
+              user,
+              response.data,
+            ),
+          );
+        }
       }
 
-      httpPost(user);
+      _getApiKey();
     }
   }
 }

@@ -1,15 +1,21 @@
 import 'package:flutter/material.dart';
+import '../Models/ScreenArguments.dart';
 
 class SendingDataScreen extends StatelessWidget {
+  static const routeName = '/extractArguments';
   @override
   Widget build(BuildContext context) {
+    final ScreenArguments args = ModalRoute.of(context).settings.arguments;
+
     return Scaffold(
         appBar: AppBar(
-          title: Text(
-            'Отправка данных',
-            style: TextStyle(color: Colors.white),
-          ),
-        ),
+            title: Text(
+              'Отправка данных',
+              style: TextStyle(color: Colors.white),
+            ),
+            iconTheme: IconThemeData(
+              color: Colors.white, //change your color here
+            )),
         body: GestureDetector(
           behavior: HitTestBehavior.opaque,
           onTap: () {
@@ -47,13 +53,22 @@ class SendingDataScreen extends StatelessWidget {
                       child: Container(
                         margin: const EdgeInsets.fromLTRB(0, 28, 0, 45),
                         child: RaisedButton(
-                          child: Text('ЗАРЕГИСТРИРОВАТЬСЯ'),
+                          child: Text('ЗАРЕГИСТРИРОВАТЬСЯ',
+                              style:
+                                  TextStyle(fontSize: 14, color: Colors.white)),
                           color: Theme.of(context).primaryColor,
-                          onPressed: () {},
+                          onPressed: () {
+                            _registerButton(args);
+                          },
                         ),
                       )))
             ],
           ),
         ));
+  }
+
+  _registerButton(ScreenArguments args) {
+    var token = args.token;
+    print(token);
   }
 }

@@ -10,33 +10,27 @@ class ValidateForm {
   String validateFirsttName(String value) {
     if (value.length < 2 && value.isNotEmpty) {
       _firstNameValided = false;
-
       return 'Введите свое имя';
     }
     _firstNameValided = true;
-
     return null;
   }
 
   String validateLastName(String value) {
     if (value.length < 2 && value.isNotEmpty) {
       _lastNameValided = false;
-
       return 'Введите свою фамилию';
     }
     _lastNameValided = true;
-
     return null;
   }
 
   String validateMobile(String value) {
     if (value.length != 17 && value.isNotEmpty) {
       _phoneValided = false;
-
       return 'Номер должен состоять из 11 цифр';
     } else {
       _phoneValided = true;
-
       return null;
     }
   }
@@ -47,7 +41,6 @@ class ValidateForm {
     RegExp regex = new RegExp(pattern);
     if (!regex.hasMatch(value) && value.isNotEmpty) {
       _emailValided = false;
-
       return 'Введите корректный email';
     } else {
       _emailValided = true;

@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-//import 'SendingDataScreen.dart';
-import 'RegisterScreen.dart';
+import 'Screens/SendingDataScreen.dart';
+import 'Screens/RegisterScreen.dart';
 
 void main() => runApp(DNSTestTask());
 
@@ -11,6 +11,9 @@ class DNSTestTask extends StatelessWidget {
         theme: ThemeData(
           primaryColor: Color(0xffED8E00),
         ),
-        home: RegisterScreen());
+        home: RegisterScreen(),
+        routes: {
+          SendingDataScreen.routeName: (context) => SendingDataScreen(),
+        });
   }
 }

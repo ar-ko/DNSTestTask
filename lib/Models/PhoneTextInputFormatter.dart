@@ -59,7 +59,6 @@ class PhoneTextInputFormatter extends TextInputFormatter {
       if (newValue.selection.end >= 9) selectionIndex++;
     }
 
-    // Dump the rest.
     if (newTextLength >= usedSubstringIndex)
       newText.write(newValue.text.substring(usedSubstringIndex));
     return TextEditingValue(
