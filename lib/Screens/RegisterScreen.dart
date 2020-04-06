@@ -42,18 +42,18 @@ class RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
       ),
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          FocusScope.of(context).requestFocus(new FocusNode());
-        },
-        child: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Container(
-                margin: const EdgeInsets.fromLTRB(15, 23, 16, 0),
-                child: _textFields()),
-          ),
+      body: SingleChildScrollView(
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            Form(
+              key: _formKey,
+              child: Container(
+                  margin: const EdgeInsets.fromLTRB(15, 23, 16, 0),
+                  child: _textFields()),
+            ),
+          ],
         ),
       ),
       bottomNavigationBar: _bottomWigets(context),
