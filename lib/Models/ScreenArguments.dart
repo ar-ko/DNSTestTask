@@ -1,7 +1,7 @@
-import '../Models/UserData.dart';
+import '../Models/UserDataForRegistration.dart';
 
 class ScreenArguments {
-  final UserData user;
+  final UserDataForRegistration user;
   final String token;
 
   ScreenArguments(this.user, this.token);

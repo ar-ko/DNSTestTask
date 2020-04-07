@@ -3,7 +3,7 @@ import 'package:dns_test_task/Screens/SendingDataScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../Models/UserData.dart';
+import '../Models/UserDataForRegistration.dart';
 import '../Models/PhoneTextInputFormatter.dart';
 import '../Models/ValidateForm.dart';
 import '../Models/ServerResponse.dart';
@@ -27,9 +27,9 @@ class RegisterScreenState extends State<RegisterScreen> {
   final _mobileFormatter = PhoneTextInputFormatter();
   final _validateForm = ValidateForm();
 
-  final focusLastName = FocusNode();
-  final focusEmail = FocusNode();
-  final focusPhone = FocusNode();
+  final _focusLastName = FocusNode();
+  final _focusEmail = FocusNode();
+  final _focusPhone = FocusNode();
 
   @override
   Widget build(BuildContext context) {
@@ -44,13 +44,11 @@ class RegisterScreenState extends State<RegisterScreen> {
       ),
       body: SingleChildScrollView(
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
-          crossAxisAlignment: CrossAxisAlignment.center,
           children: [
             Form(
               key: _formKey,
               child: Container(
-                  margin: const EdgeInsets.fromLTRB(15, 23, 16, 0),
+                  margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
                   child: _textFields()),
             ),
           ],
@@ -60,7 +58,7 @@ class RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  // MARK: text fields
+  // Text fields
 
   Widget _textFields() {
     return Column(
@@ -77,14 +75,14 @@ class RegisterScreenState extends State<RegisterScreen> {
           validator: _validateForm.validateFirsttName,
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (v) {
-            FocusScope.of(context).requestFocus(focusLastName);
+            FocusScope.of(context).requestFocus(_focusLastName);
           },
         ),
         SizedBox(
           height: 28,
         ),
         TextFormField(
-          focusNode: focusLastName,
+          focusNode: _focusLastName,
           autovalidate: true,
           controller: _lastNameController,
           keyboardType: TextInputType.text,
@@ -96,14 +94,14 @@ class RegisterScreenState extends State<RegisterScreen> {
           validator: _validateForm.validateLastName,
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (v) {
-            FocusScope.of(context).requestFocus(focusEmail);
+            FocusScope.of(context).requestFocus(_focusEmail);
           },
         ),
         SizedBox(
           height: 28,
         ),
         TextFormField(
-          focusNode: focusEmail,
+          focusNode: _focusEmail,
           autovalidate: true,
           controller: _emailController,
           keyboardType: TextInputType.emailAddress,
@@ -114,14 +112,14 @@ class RegisterScreenState extends State<RegisterScreen> {
           validator: _validateForm.validateEmail,
           textInputAction: TextInputAction.next,
           onFieldSubmitted: (v) {
-            FocusScope.of(context).requestFocus(focusPhone);
+            FocusScope.of(context).requestFocus(_focusPhone);
           },
         ),
         SizedBox(
           height: 28,
         ),
         TextFormField(
-          focusNode: focusPhone,
+          focusNode: _focusPhone,
           autovalidate: true,
           controller: _phoneController,
           textCapitalization: TextCapitalization.sentences,
@@ -166,21 +164,17 @@ class RegisterScreenState extends State<RegisterScreen> {
 
   void _buttonPressed(GlobalKey<FormState> _formKey) {
     if (_formKey.currentState.validate()) {
-      UserData user = new UserData(
+      UserDataForRegistration user = new UserDataForRegistration(
           firstName: _firstNameController.text,
           lastName: _lastNameController.text,
           email: _emailController.text,
           phone: _phoneController.text);
 
-      void _getApiKey() async {
-        var json = await NetworkService().getKey(user);
+      void _getToken() async {
+        var json = await NetworkService().getToken(user);
         var response = ServerResponse.fromJson(json);
 
         if (response.code == 0) {
-          /*Navigator.push(
-            context,
-            MaterialPageRoute(builder: (context) => SendingDataScreen()),
-          );*/
           Navigator.pushNamed(
             context,
             SendingDataScreen.routeName,
@@ -192,7 +186,7 @@ class RegisterScreenState extends State<RegisterScreen> {
         }
       }
 
-      _getApiKey();
+      _getToken();
     }
   }
 }

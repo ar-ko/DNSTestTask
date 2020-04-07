@@ -1,11 +1,18 @@
+import 'package:dns_test_task/Models/FullUserData.dart';
 import 'package:flutter/material.dart';
+import '../Network/NetworkService.dart';
 import '../Models/ScreenArguments.dart';
+import '../Models/ServerResponse.dart';
 
 class SendingDataScreen extends StatelessWidget {
   static const routeName = '/extractArguments';
+  final _githubProfileUrlController = TextEditingController();
+  final _summaryUrlController = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
-    final ScreenArguments args = ModalRoute.of(context).settings.arguments;
+    final ScreenArguments arguments = ModalRoute.of(context).settings.arguments;
+    final _formKey = GlobalKey<FormState>();
 
     return Scaffold(
       appBar: AppBar(
@@ -21,61 +28,137 @@ class SendingDataScreen extends StatelessWidget {
         onTap: () {
           FocusScope.of(context).requestFocus(new FocusNode());
         },
-        child: Column(
-          children: [
-            Container(
-              margin: const EdgeInsets.fromLTRB(15, 23, 16, 0),
-              child: Column(
-                children: [
-                  TextFormField(
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: const InputDecoration(
-                      hintText: 'Ссылка на github',
-                      hintStyle: TextStyle(fontSize: 16),
-                    ),
+        child: SingleChildScrollView(
+          child: Column(
+            children: [
+              Form(
+                key: _formKey,
+                child: Container(
+                  margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
+                  child: Column(
+                    children: [
+                      TextFormField(
+                        controller: _githubProfileUrlController,
+                        textCapitalization: TextCapitalization.sentences,
+                        decoration: const InputDecoration(
+                          hintText: 'Ссылка на github',
+                          hintStyle: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                      SizedBox(
+                        height: 29,
+                      ),
+                      TextFormField(
+                        controller: _summaryUrlController,
+                        textCapitalization: TextCapitalization.sentences,
+                        decoration: const InputDecoration(
+                          hintText: 'Ссылка на резюме',
+                          hintStyle: TextStyle(fontSize: 16),
+                        ),
+                      ),
+                    ],
                   ),
-                  SizedBox(
-                    height: 29,
-                  ),
-                  TextFormField(
-                    textCapitalization: TextCapitalization.sentences,
-                    decoration: const InputDecoration(
-                      hintText: 'Ссылка на резюме',
-                      hintStyle: TextStyle(fontSize: 16),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
-      bottomNavigationBar: _bottomWigets(context),
+      bottomNavigationBar: Container(
+          height: 36,
+          width: 160,
+          margin: const EdgeInsets.only(bottom: 45),
+          child: Align(
+            alignment: Alignment.bottomCenter,
+            child: RaisedButton(
+              onPressed: () {
+                _registerButton(arguments, context);
+              },
+              child: Text(
+                'ЗАРЕГИСТРИРОВАТЬСЯ',
+                style: TextStyle(fontSize: 14, color: Colors.white),
+              ),
+              color: Theme.of(context).primaryColor,
+            ),
+          )),
     );
   }
 
-  Widget _bottomWigets(BuildContext context) {
-    return Container(
-        height: 36,
-        width: 160,
-        margin: const EdgeInsets.only(bottom: 45),
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: RaisedButton(
-            onPressed: () {
-              _registerButton();
-            },
-            child: Text(
-              'ЗАРЕГИСТРИРОВАТЬСЯ',
-              style: TextStyle(fontSize: 14, color: Colors.white),
-            ),
-            color: Theme.of(context).primaryColor,
-          ),
-        ));
-  }
+  void _registerButton(ScreenArguments arguments, BuildContext context) {
+    final FullUserData user = FullUserData(
+        user: arguments.user,
+        githubProfileUrl: _githubProfileUrlController.text,
+        summaryUrl: _summaryUrlController.text);
 
-  _registerButton() {
-    /*var token = args.token;
-    print(token);*/
+    void _showDialog(BuildContext context, ServerResponse response) {
+      if (response.code == 0) {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text(
+                'Заявка успешно отправлена',
+                textAlign: TextAlign.center,
+              ),
+              content: Icon(
+                Icons.done,
+                size: 100,
+              ),
+              actions: [
+                FlatButton(
+                  child: Text('ОК'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          },
+        );
+      } else {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Column(
+                children: [
+                  Icon(
+                    Icons.warning,
+                    size: 100,
+                  ),
+                  Text(
+                    'Что-то пошло не так',
+                    textAlign: TextAlign.center,
+                  ),
+                ],
+              ),
+              content: Text(response.message),
+              actions: [
+                FlatButton(
+                  child: Text('ОК'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                )
+              ],
+            );
+          },
+        );
+      }
+    }
+
+    void _register(BuildContext context) async {
+      var json =
+          await NetworkService().registerCandidate(user, arguments.token);
+      var response = ServerResponse.fromJson(json);
+      /*if (response.code == 0) {
+        _showDialog(context, response);
+      } else {
+        print(response.message);
+      }*/
+      _showDialog(context, response);
+    }
+
+    _register(context);
   }
 }
