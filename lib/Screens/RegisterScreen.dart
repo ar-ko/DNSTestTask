@@ -31,6 +31,7 @@ class RegisterScreenState extends State<RegisterScreen> {
   final _focusEmail = FocusNode();
   final _focusPhone = FocusNode();
 
+  bool _showButton = false;
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -54,16 +55,27 @@ class RegisterScreenState extends State<RegisterScreen> {
           ],
         ),
       ),
-      bottomNavigationBar: _bottomWigets(context),
+      bottomNavigationBar: _bottomWigets(context, _showButton),
     );
   }
 
-  // Text fields
+  void _updateButton() {
+    setState(() {
+      _showButton = _emailController.text.isNotEmpty &&
+          _firstNameController.text.isNotEmpty &&
+          _lastNameController.text.isNotEmpty &&
+          _phoneController.text.isNotEmpty &&
+          _formKey.currentState.validate();
+    });
+  }
 
   Widget _textFields() {
     return Column(
       children: [
         TextFormField(
+          onChanged: (_) {
+            _updateButton();
+          },
           autovalidate: true,
           controller: _firstNameController,
           keyboardType: TextInputType.text,
@@ -82,6 +94,9 @@ class RegisterScreenState extends State<RegisterScreen> {
           height: 28,
         ),
         TextFormField(
+          onChanged: (_) {
+            _updateButton();
+          },
           focusNode: _focusLastName,
           autovalidate: true,
           controller: _lastNameController,
@@ -101,6 +116,9 @@ class RegisterScreenState extends State<RegisterScreen> {
           height: 28,
         ),
         TextFormField(
+          onChanged: (_) {
+            _updateButton();
+          },
           focusNode: _focusEmail,
           autovalidate: true,
           controller: _emailController,
@@ -119,6 +137,9 @@ class RegisterScreenState extends State<RegisterScreen> {
           height: 28,
         ),
         TextFormField(
+          onChanged: (_) {
+            _updateButton();
+          },
           focusNode: _focusPhone,
           autovalidate: true,
           controller: _phoneController,
@@ -142,7 +163,7 @@ class RegisterScreenState extends State<RegisterScreen> {
     );
   }
 
-  Widget _bottomWigets(BuildContext context) {
+  Widget _bottomWigets(BuildContext context, bool _showButton) {
     return Container(
         height: 36,
         width: 160,
@@ -150,9 +171,11 @@ class RegisterScreenState extends State<RegisterScreen> {
         child: Align(
           alignment: Alignment.bottomCenter,
           child: RaisedButton(
-            onPressed: () {
-              _buttonPressed(_formKey);
-            },
+            onPressed: _showButton
+                ? () {
+                    _buttonPressed(_formKey);
+                  }
+                : null,
             child: Text(
               'ПОЛУЧИТЬ КЛЮЧ',
               style: TextStyle(fontSize: 14, color: Colors.white),

@@ -3,9 +3,12 @@ import 'package:flutter/material.dart';
 import '../Network/NetworkService.dart';
 import '../Models/ScreenArguments.dart';
 import '../Models/ServerResponse.dart';
+import '../Models/ValidateForm.dart';
 
 class SendingDataScreen extends StatelessWidget {
   static const routeName = '/extractArguments';
+  final _focusSummaryUrl = FocusNode();
+
   final _githubProfileUrlController = TextEditingController();
   final _summaryUrlController = TextEditingController();
 
@@ -13,22 +16,23 @@ class SendingDataScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     final ScreenArguments arguments = ModalRoute.of(context).settings.arguments;
     final _formKey = GlobalKey<FormState>();
+    final ValidateForm _validateForm = ValidateForm();
 
-    return Scaffold(
-      appBar: AppBar(
-          title: Text(
-            'Отправка данных',
-            style: TextStyle(color: Colors.white),
-          ),
-          iconTheme: IconThemeData(
-            color: Colors.white, //change your color here
-          )),
-      body: GestureDetector(
-        behavior: HitTestBehavior.opaque,
-        onTap: () {
-          FocusScope.of(context).requestFocus(new FocusNode());
-        },
-        child: SingleChildScrollView(
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        FocusScope.of(context).requestFocus(new FocusNode());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+            title: Text(
+              'Отправка данных',
+              style: TextStyle(color: Colors.white),
+            ),
+            iconTheme: IconThemeData(
+              color: Colors.white, //change your color here
+            )),
+        body: SingleChildScrollView(
           child: Column(
             children: [
               Form(
@@ -38,24 +42,35 @@ class SendingDataScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       TextFormField(
-                        controller: _githubProfileUrlController,
-                        textCapitalization: TextCapitalization.sentences,
-                        decoration: const InputDecoration(
-                          hintText: 'Ссылка на github',
-                          hintStyle: TextStyle(fontSize: 16),
-                        ),
-                      ),
+                          autovalidate: true,
+                          controller: _githubProfileUrlController,
+                          textCapitalization: TextCapitalization.sentences,
+                          decoration: const InputDecoration(
+                            hintText: 'Ссылка на github',
+                            hintStyle: TextStyle(fontSize: 16),
+                          ),
+                          validator: _validateForm.validateGithub,
+                          textInputAction: TextInputAction.next,
+                          onFieldSubmitted: (v) {
+                            FocusScope.of(context)
+                                .requestFocus(_focusSummaryUrl);
+                          }),
                       SizedBox(
                         height: 29,
                       ),
                       TextFormField(
-                        controller: _summaryUrlController,
-                        textCapitalization: TextCapitalization.sentences,
-                        decoration: const InputDecoration(
-                          hintText: 'Ссылка на резюме',
-                          hintStyle: TextStyle(fontSize: 16),
-                        ),
-                      ),
+                          autovalidate: true,
+                          focusNode: _focusSummaryUrl,
+                          controller: _summaryUrlController,
+                          textCapitalization: TextCapitalization.sentences,
+                          decoration: const InputDecoration(
+                            hintText: 'Ссылка на резюме',
+                            hintStyle: TextStyle(fontSize: 16),
+                          ),
+                          validator: _validateForm.validateURL,
+                          onFieldSubmitted: (v) {
+                            _registerButton(arguments, context);
+                          }),
                     ],
                   ),
                 ),
@@ -63,24 +78,24 @@ class SendingDataScreen extends StatelessWidget {
             ],
           ),
         ),
-      ),
-      bottomNavigationBar: Container(
-          height: 36,
-          width: 160,
-          margin: const EdgeInsets.only(bottom: 45),
-          child: Align(
-            alignment: Alignment.bottomCenter,
-            child: RaisedButton(
-              onPressed: () {
-                _registerButton(arguments, context);
-              },
-              child: Text(
-                'ЗАРЕГИСТРИРОВАТЬСЯ',
-                style: TextStyle(fontSize: 14, color: Colors.white),
+        bottomNavigationBar: Container(
+            height: 36,
+            width: 160,
+            margin: const EdgeInsets.only(bottom: 45),
+            child: Align(
+              alignment: Alignment.bottomCenter,
+              child: RaisedButton(
+                onPressed: () {
+                  _registerButton(arguments, context);
+                },
+                child: Text(
+                  'ЗАРЕГИСТРИРОВАТЬСЯ',
+                  style: TextStyle(fontSize: 14, color: Colors.white),
+                ),
+                color: Theme.of(context).primaryColor,
               ),
-              color: Theme.of(context).primaryColor,
-            ),
-          )),
+            )),
+      ),
     );
   }
 
