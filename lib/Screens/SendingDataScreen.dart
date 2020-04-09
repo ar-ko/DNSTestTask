@@ -5,18 +5,36 @@ import '../Models/ScreenArguments.dart';
 import '../Models/ServerResponse.dart';
 import '../Models/ValidateForm.dart';
 
-class SendingDataScreen extends StatelessWidget {
+class SendingDataScreen extends StatefulWidget {
+  @override
+  SendingDataScreenState createState() {
+    return SendingDataScreenState();
+  }
+}
+
+class SendingDataScreenState extends State<SendingDataScreen> {
   static const routeName = '/extractArguments';
   final _focusSummaryUrl = FocusNode();
 
   final _githubProfileUrlController = TextEditingController();
   final _summaryUrlController = TextEditingController();
 
+  final _formKey = GlobalKey<FormState>();
+  final ValidateForm _validateForm = ValidateForm();
+
+  bool _showButton = false;
+
   @override
   Widget build(BuildContext context) {
     final ScreenArguments arguments = ModalRoute.of(context).settings.arguments;
-    final _formKey = GlobalKey<FormState>();
-    final ValidateForm _validateForm = ValidateForm();
+
+    void _updateButton() {
+      setState(() {
+        _showButton = _githubProfileUrlController.text.isNotEmpty &&
+            _summaryUrlController.text.isNotEmpty &&
+            _formKey.currentState.validate();
+      });
+    }
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -27,7 +45,9 @@ class SendingDataScreen extends StatelessWidget {
         appBar: AppBar(
             title: Text(
               'Отправка данных',
-              style: TextStyle(color: Colors.white),
+              style: TextStyle(
+                color: Colors.white,
+              ),
             ),
             iconTheme: IconThemeData(
               color: Colors.white, //change your color here
@@ -42,9 +62,13 @@ class SendingDataScreen extends StatelessWidget {
                   child: Column(
                     children: [
                       TextFormField(
+                          onChanged: (_) {
+                            _updateButton();
+                          },
                           autovalidate: true,
                           controller: _githubProfileUrlController,
-                          textCapitalization: TextCapitalization.sentences,
+                          textCapitalization: TextCapitalization.none,
+                          keyboardType: TextInputType.text,
                           decoration: const InputDecoration(
                             hintText: 'Ссылка на github',
                             hintStyle: TextStyle(fontSize: 16),
@@ -59,10 +83,13 @@ class SendingDataScreen extends StatelessWidget {
                         height: 29,
                       ),
                       TextFormField(
+                          onChanged: (_) {
+                            _updateButton();
+                          },
                           autovalidate: true,
                           focusNode: _focusSummaryUrl,
                           controller: _summaryUrlController,
-                          textCapitalization: TextCapitalization.sentences,
+                          textCapitalization: TextCapitalization.none,
                           decoration: const InputDecoration(
                             hintText: 'Ссылка на резюме',
                             hintStyle: TextStyle(fontSize: 16),
@@ -85,9 +112,11 @@ class SendingDataScreen extends StatelessWidget {
             child: Align(
               alignment: Alignment.bottomCenter,
               child: RaisedButton(
-                onPressed: () {
-                  _registerButton(arguments, context);
-                },
+                onPressed: _showButton
+                    ? () {
+                        _registerButton(arguments, context);
+                      }
+                    : null,
                 child: Text(
                   'ЗАРЕГИСТРИРОВАТЬСЯ',
                   style: TextStyle(fontSize: 14, color: Colors.white),

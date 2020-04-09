@@ -32,30 +32,37 @@ class RegisterScreenState extends State<RegisterScreen> {
   final _focusPhone = FocusNode();
 
   bool _showButton = false;
+
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      appBar: AppBar(
-        title: Text(
-          'Ввод данных',
-          style: TextStyle(
-            color: Colors.white,
+    return GestureDetector(
+      behavior: HitTestBehavior.opaque,
+      onTap: () {
+        FocusScope.of(context).requestFocus(new FocusNode());
+      },
+      child: Scaffold(
+        appBar: AppBar(
+          title: Text(
+            'Ввод данных',
+            style: TextStyle(
+              color: Colors.white,
+            ),
           ),
         ),
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Form(
-              key: _formKey,
-              child: Container(
-                  margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
-                  child: _textFields()),
-            ),
-          ],
+        body: SingleChildScrollView(
+          child: Column(
+            children: [
+              Form(
+                key: _formKey,
+                child: Container(
+                    margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
+                    child: _textFields()),
+              ),
+            ],
+          ),
         ),
+        bottomNavigationBar: _bottomWigets(context, _showButton),
       ),
-      bottomNavigationBar: _bottomWigets(context, _showButton),
     );
   }
 
@@ -200,7 +207,7 @@ class RegisterScreenState extends State<RegisterScreen> {
         if (response.code == 0) {
           Navigator.pushNamed(
             context,
-            SendingDataScreen.routeName,
+            SendingDataScreenState.routeName,
             arguments: ScreenArguments(
               user,
               response.data,

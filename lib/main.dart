@@ -12,14 +12,9 @@ class DNSTestTask extends StatelessWidget {
           primaryColor: Color(0xffED8E00),
         ),
         //home: RegisterScreen(),
-        home: GestureDetector(
-            behavior: HitTestBehavior.opaque,
-            onTap: () {
-              FocusScope.of(context).requestFocus(new FocusNode());
-            },
-            child: RegisterScreen()),
+        home: RegisterScreen(),
         routes: {
-          SendingDataScreen.routeName: (context) => SendingDataScreen(),
+          SendingDataScreenState.routeName: (context) => SendingDataScreen(),
         });
   }
 }
