@@ -33,6 +33,16 @@ class RegisterScreenState extends State<RegisterScreen> {
 
   bool _showButton = false;
 
+  void _updateButton() {
+    setState(() {
+      _showButton = _emailController.text.isNotEmpty &&
+          _firstNameController.text.isNotEmpty &&
+          _lastNameController.text.isNotEmpty &&
+          _phoneController.text.isNotEmpty &&
+          _formKey.currentState.validate();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
@@ -50,127 +60,125 @@ class RegisterScreenState extends State<RegisterScreen> {
           ),
         ),
         body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Form(
-                key: _formKey,
-                child: Container(
-                    margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
-                    child: _textFields()),
+          child: Form(
+            key: _formKey,
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
+              child: Column(
+                children: [
+                  _firstNameForm(),
+                  _indent(),
+                  _lastNameForm(),
+                  _indent(),
+                  _emailForm(),
+                  _indent(),
+                  _phoneForm(),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-        bottomNavigationBar: _bottomWigets(context, _showButton),
+        bottomNavigationBar: _bottomButton(context),
       ),
     );
   }
 
-  void _updateButton() {
-    setState(() {
-      _showButton = _emailController.text.isNotEmpty &&
-          _firstNameController.text.isNotEmpty &&
-          _lastNameController.text.isNotEmpty &&
-          _phoneController.text.isNotEmpty &&
-          _formKey.currentState.validate();
-    });
-  }
-
-  Widget _textFields() {
-    return Column(
-      children: [
-        TextFormField(
-          onChanged: (_) {
-            _updateButton();
-          },
-          autovalidate: true,
-          controller: _firstNameController,
-          keyboardType: TextInputType.text,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: const InputDecoration(
-            hintText: 'Имя',
-            hintStyle: TextStyle(fontSize: 16),
-          ),
-          validator: _validateForm.validateFirsttName,
-          textInputAction: TextInputAction.next,
-          onFieldSubmitted: (v) {
-            FocusScope.of(context).requestFocus(_focusLastName);
-          },
-        ),
-        SizedBox(
-          height: 28,
-        ),
-        TextFormField(
-          onChanged: (_) {
-            _updateButton();
-          },
-          focusNode: _focusLastName,
-          autovalidate: true,
-          controller: _lastNameController,
-          keyboardType: TextInputType.text,
-          textCapitalization: TextCapitalization.sentences,
-          decoration: const InputDecoration(
-            hintText: 'Фамилия',
-            hintStyle: TextStyle(fontSize: 16),
-          ),
-          validator: _validateForm.validateLastName,
-          textInputAction: TextInputAction.next,
-          onFieldSubmitted: (v) {
-            FocusScope.of(context).requestFocus(_focusEmail);
-          },
-        ),
-        SizedBox(
-          height: 28,
-        ),
-        TextFormField(
-          onChanged: (_) {
-            _updateButton();
-          },
-          focusNode: _focusEmail,
-          autovalidate: true,
-          controller: _emailController,
-          keyboardType: TextInputType.emailAddress,
-          decoration: const InputDecoration(
-            hintText: 'E-mail',
-            hintStyle: TextStyle(fontSize: 16),
-          ),
-          validator: _validateForm.validateEmail,
-          textInputAction: TextInputAction.next,
-          onFieldSubmitted: (v) {
-            FocusScope.of(context).requestFocus(_focusPhone);
-          },
-        ),
-        SizedBox(
-          height: 28,
-        ),
-        TextFormField(
-          onChanged: (_) {
-            _updateButton();
-          },
-          focusNode: _focusPhone,
-          autovalidate: true,
-          controller: _phoneController,
-          textCapitalization: TextCapitalization.sentences,
-          keyboardType: TextInputType.phone,
-          decoration: const InputDecoration(
-            hintText: 'Телефон',
-            hintStyle: TextStyle(fontSize: 16),
-          ),
-          validator: _validateForm.validateMobile,
-          //maxLength: 15,
-          inputFormatters: <TextInputFormatter>[
-            WhitelistingTextInputFormatter.digitsOnly,
-            _mobileFormatter,
-          ],
-          onFieldSubmitted: (v) {
-            _buttonPressed(_formKey);
-          },
-        ),
-      ],
+  Widget _firstNameForm() {
+    return TextFormField(
+      onChanged: (_) {
+        _updateButton();
+      },
+      autovalidate: true,
+      controller: _firstNameController,
+      keyboardType: TextInputType.text,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: const InputDecoration(
+        hintText: 'Имя',
+        hintStyle: TextStyle(fontSize: 16),
+      ),
+      validator: _validateForm.validateFirsttName,
+      textInputAction: TextInputAction.next,
+      onFieldSubmitted: (v) {
+        FocusScope.of(context).requestFocus(_focusLastName);
+      },
     );
   }
 
-  Widget _bottomWigets(BuildContext context, bool _showButton) {
+  Widget _lastNameForm() {
+    return TextFormField(
+      onChanged: (_) {
+        _updateButton();
+      },
+      focusNode: _focusLastName,
+      autovalidate: true,
+      controller: _lastNameController,
+      keyboardType: TextInputType.text,
+      textCapitalization: TextCapitalization.sentences,
+      decoration: const InputDecoration(
+        hintText: 'Фамилия',
+        hintStyle: TextStyle(fontSize: 16),
+      ),
+      validator: _validateForm.validateLastName,
+      textInputAction: TextInputAction.next,
+      onFieldSubmitted: (v) {
+        FocusScope.of(context).requestFocus(_focusEmail);
+      },
+    );
+  }
+
+  Widget _emailForm() {
+    return TextFormField(
+      onChanged: (_) {
+        _updateButton();
+      },
+      focusNode: _focusEmail,
+      autovalidate: true,
+      controller: _emailController,
+      keyboardType: TextInputType.emailAddress,
+      decoration: const InputDecoration(
+        hintText: 'E-mail',
+        hintStyle: TextStyle(fontSize: 16),
+      ),
+      validator: _validateForm.validateEmail,
+      textInputAction: TextInputAction.next,
+      onFieldSubmitted: (v) {
+        FocusScope.of(context).requestFocus(_focusPhone);
+      },
+    );
+  }
+
+  Widget _phoneForm() {
+    return TextFormField(
+      onChanged: (_) {
+        _updateButton();
+      },
+      focusNode: _focusPhone,
+      autovalidate: true,
+      controller: _phoneController,
+      textCapitalization: TextCapitalization.sentences,
+      keyboardType: TextInputType.phone,
+      decoration: const InputDecoration(
+        hintText: 'Телефон',
+        hintStyle: TextStyle(fontSize: 16),
+      ),
+      validator: _validateForm.validateMobile,
+      inputFormatters: <TextInputFormatter>[
+        WhitelistingTextInputFormatter.digitsOnly,
+        _mobileFormatter,
+      ],
+      onFieldSubmitted: (v) {
+        if (_showButton) _buttonPressed(_formKey);
+      },
+    );
+  }
+
+  Widget _indent() {
+    return SizedBox(
+      height: 28,
+    );
+  }
+
+  Widget _bottomButton(BuildContext context) {
     return Container(
         height: 36,
         width: 160,
@@ -200,23 +208,23 @@ class RegisterScreenState extends State<RegisterScreen> {
           email: _emailController.text,
           phone: _phoneController.text);
 
-      void _getToken() async {
-        var json = await NetworkService().getToken(user);
-        var response = ServerResponse.fromJson(json);
+      _getToken(user);
+    }
+  }
 
-        if (response.code == 0) {
-          Navigator.pushNamed(
-            context,
-            SendingDataScreenState.routeName,
-            arguments: ScreenArguments(
-              user,
-              response.data,
-            ),
-          );
-        }
-      }
+  void _getToken(UserDataForRegistration user) async {
+    var json = await NetworkService().getToken(user);
+    var response = ServerResponse.fromJson(json);
 
-      _getToken();
+    if (response.code == 0) {
+      Navigator.pushNamed(
+        context,
+        SendingDataScreenState.routeName,
+        arguments: ScreenArguments(
+          user,
+          response.data,
+        ),
+      );
     }
   }
 }

@@ -13,7 +13,7 @@ class SendingDataScreen extends StatefulWidget {
 }
 
 class SendingDataScreenState extends State<SendingDataScreen> {
-  static const routeName = '/extractArguments';
+  static const routeName = 'SendingDataScreen';
   final _focusSummaryUrl = FocusNode();
 
   final _githubProfileUrlController = TextEditingController();
@@ -24,17 +24,17 @@ class SendingDataScreenState extends State<SendingDataScreen> {
 
   bool _showButton = false;
 
+  void _updateButton() {
+    setState(() {
+      _showButton = _githubProfileUrlController.text.isNotEmpty &&
+          _summaryUrlController.text.isNotEmpty &&
+          _formKey.currentState.validate();
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final ScreenArguments arguments = ModalRoute.of(context).settings.arguments;
-
-    void _updateButton() {
-      setState(() {
-        _showButton = _githubProfileUrlController.text.isNotEmpty &&
-            _summaryUrlController.text.isNotEmpty &&
-            _formKey.currentState.validate();
-      });
-    }
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
@@ -53,79 +53,62 @@ class SendingDataScreenState extends State<SendingDataScreen> {
               color: Colors.white, //change your color here
             )),
         body: SingleChildScrollView(
-          child: Column(
-            children: [
-              Form(
-                key: _formKey,
-                child: Container(
-                  margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
-                  child: Column(
-                    children: [
-                      TextFormField(
-                          onChanged: (_) {
-                            _updateButton();
-                          },
-                          autovalidate: true,
-                          controller: _githubProfileUrlController,
-                          textCapitalization: TextCapitalization.none,
-                          keyboardType: TextInputType.text,
-                          decoration: const InputDecoration(
-                            hintText: 'Ссылка на github',
-                            hintStyle: TextStyle(fontSize: 16),
-                          ),
-                          validator: _validateForm.validateGithub,
-                          textInputAction: TextInputAction.next,
-                          onFieldSubmitted: (v) {
-                            FocusScope.of(context)
-                                .requestFocus(_focusSummaryUrl);
-                          }),
-                      SizedBox(
-                        height: 29,
-                      ),
-                      TextFormField(
-                          onChanged: (_) {
-                            _updateButton();
-                          },
-                          autovalidate: true,
-                          focusNode: _focusSummaryUrl,
-                          controller: _summaryUrlController,
-                          textCapitalization: TextCapitalization.none,
-                          decoration: const InputDecoration(
-                            hintText: 'Ссылка на резюме',
-                            hintStyle: TextStyle(fontSize: 16),
-                          ),
-                          validator: _validateForm.validateURL,
-                          onFieldSubmitted: (v) {
-                            _registerButton(arguments, context);
-                          }),
-                    ],
-                  ),
-                ),
+          child: Form(
+            key: _formKey,
+            child: Container(
+              margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
+              child: Column(
+                children: [
+                  _gihubURLForm(),
+                  SizedBox(height: 29),
+                  _summaryURLForm(arguments),
+                ],
               ),
-            ],
+            ),
           ),
         ),
-        bottomNavigationBar: Container(
-            height: 36,
-            width: 160,
-            margin: const EdgeInsets.only(bottom: 45),
-            child: Align(
-              alignment: Alignment.bottomCenter,
-              child: RaisedButton(
-                onPressed: _showButton
-                    ? () {
-                        _registerButton(arguments, context);
-                      }
-                    : null,
-                child: Text(
-                  'ЗАРЕГИСТРИРОВАТЬСЯ',
-                  style: TextStyle(fontSize: 14, color: Colors.white),
-                ),
-                color: Theme.of(context).primaryColor,
-              ),
-            )),
+        bottomNavigationBar: _bottomButton(arguments),
       ),
     );
+  }
+
+  Widget _gihubURLForm() {
+    return TextFormField(
+        onChanged: (_) {
+          _updateButton();
+        },
+        autovalidate: true,
+        controller: _githubProfileUrlController,
+        textCapitalization: TextCapitalization.none,
+        keyboardType: TextInputType.text,
+        decoration: const InputDecoration(
+          hintText: 'Ссылка на github',
+          hintStyle: TextStyle(fontSize: 16),
+        ),
+        validator: _validateForm.validateGithub,
+        textInputAction: TextInputAction.next,
+        onFieldSubmitted: (v) {
+          FocusScope.of(context).requestFocus(_focusSummaryUrl);
+        });
+  }
+
+  Widget _summaryURLForm(ScreenArguments arguments) {
+    return TextFormField(
+        onChanged: (_) {
+          _updateButton();
+        },
+        autovalidate: true,
+        focusNode: _focusSummaryUrl,
+        controller: _summaryUrlController,
+        textCapitalization: TextCapitalization.none,
+        decoration: const InputDecoration(
+          hintText: 'Ссылка на резюме',
+          hintStyle: TextStyle(fontSize: 16),
+        ),
+        validator: _validateForm.validateURL,
+        onFieldSubmitted: (v) {
+          if (_showButton) _registerButton(arguments, context);
+        });
   }
 
   void _registerButton(ScreenArguments arguments, BuildContext context) {
@@ -134,75 +117,92 @@ class SendingDataScreenState extends State<SendingDataScreen> {
         githubProfileUrl: _githubProfileUrlController.text,
         summaryUrl: _summaryUrlController.text);
 
-    void _showDialog(BuildContext context, ServerResponse response) {
-      if (response.code == 0) {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Text(
-                'Заявка успешно отправлена',
-                textAlign: TextAlign.center,
-              ),
-              content: Icon(
-                Icons.done,
-                size: 100,
-              ),
-              actions: [
-                FlatButton(
-                  child: Text('ОК'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          },
-        );
-      } else {
-        showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            return AlertDialog(
-              title: Column(
-                children: [
-                  Icon(
-                    Icons.warning,
-                    size: 100,
-                  ),
-                  Text(
-                    'Что-то пошло не так',
-                    textAlign: TextAlign.center,
-                  ),
-                ],
-              ),
-              content: Text(response.message),
-              actions: [
-                FlatButton(
-                  child: Text('ОК'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                )
-              ],
-            );
-          },
-        );
-      }
-    }
+    _register(context, user, arguments);
+  }
 
-    void _register(BuildContext context) async {
-      var json =
-          await NetworkService().registerCandidate(user, arguments.token);
-      var response = ServerResponse.fromJson(json);
-      /*if (response.code == 0) {
-        _showDialog(context, response);
-      } else {
-        print(response.message);
-      }*/
-      _showDialog(context, response);
-    }
+  void _register(BuildContext context, FullUserData user,
+      ScreenArguments arguments) async {
+    var json = await NetworkService().registerCandidate(user, arguments.token);
+    var response = ServerResponse.fromJson(json);
+    _showDialog(context, response);
+  }
 
-    _register(context);
+  void _showDialog(BuildContext context, ServerResponse response) {
+    if (response.code == 0) {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Text(
+              'Заявка успешно отправлена',
+              textAlign: TextAlign.center,
+            ),
+            content: Icon(
+              Icons.done,
+              size: 100,
+            ),
+            actions: [
+              FlatButton(
+                child: Text('ОК'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    } else {
+      showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Column(
+              children: [
+                Icon(
+                  Icons.warning,
+                  size: 100,
+                ),
+                Text(
+                  'Что-то пошло не так',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            content: Text(response.message),
+            actions: [
+              FlatButton(
+                child: Text('ОК'),
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
+    }
+  }
+
+  Widget _bottomButton(ScreenArguments arguments) {
+    return Container(
+        height: 36,
+        width: 160,
+        margin: const EdgeInsets.only(bottom: 45),
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: RaisedButton(
+            onPressed: _showButton
+                ? () {
+                    _registerButton(arguments, context);
+                  }
+                : null,
+            child: Text(
+              'ЗАРЕГИСТРИРОВАТЬСЯ',
+              style: TextStyle(fontSize: 14, color: Colors.white),
+            ),
+            color: Theme.of(context).primaryColor,
+          ),
+        ));
   }
 }
