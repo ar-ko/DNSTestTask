@@ -1,39 +1,41 @@
+import '../Models/User.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import '../Models/UserDataForRegistration.dart';
-import '../Models/FullUserData.dart';
 
-class NetworkService {
-  getToken(UserDataForRegistration user) async {
-    var response = await http.post(
-      'https://vacancy.dns-shop.ru/api/candidate/token',
-      body: jsonEncode(user),
-      headers: {
+class NetworkHelper {
+  NetworkHelper({
+    this.url,
+    this.user,
+    this.token,
+  }) {
+    if (token != null) {
+      this.headers = {
         'Content-Type': 'application/json; charset=utf-8 ',
-      },
+        'Authorization': 'Bearer $token',
+      };
+    } else {
+      this.headers = {
+        'Content-Type': 'application/json; charset=utf-8 ',
+      };
+    }
+  }
+
+  final String url;
+  final User user;
+  final String token;
+  Map<String, String> headers;
+
+  Future getData() async {
+    final http.Response response = await http.post(
+      url,
+      body: jsonEncode(user),
+      headers: headers,
     );
+
     if (response.statusCode == 200) {
       return json.decode(utf8.decode(response.bodyBytes));
     } else {
       print(response.statusCode);
     }
-  }
-
-    registerCandidate(FullUserData user, String token) async {
-    var response = await http.post(
-      'https://vacancy.dns-shop.ru/api/candidate/test/summary',
-      body: jsonEncode(user),
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8 ',
-        'Authorization': 'Bearer $token',
-      },
-    );
-    
-    /*print(json.decode(utf8.decode(response.bodyBytes)));
-    if (response.statusCode == 200) { */     
-      return json.decode(utf8.decode(response.bodyBytes));
-    /*} else {
-      print(response.statusCode);
-    }*/
   }
 }

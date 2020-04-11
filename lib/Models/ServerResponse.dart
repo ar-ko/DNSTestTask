@@ -1,7 +1,7 @@
 class ServerResponse {
-  int code;
-  String message;
-  String data;
+  final int code;
+  final String message;
+  final String data;
 
   ServerResponse.fromJson(Map<String, dynamic> json)
       : code = json['code'],

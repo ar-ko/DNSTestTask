@@ -11,7 +11,6 @@ class DNSTestTask extends StatelessWidget {
         theme: ThemeData(
           primaryColor: Color(0xffED8E00),
         ),
-        //home: RegisterScreen(),
         home: RegisterScreen(),
         routes: {
           SendingDataScreenState.routeName: (context) => SendingDataScreen(),

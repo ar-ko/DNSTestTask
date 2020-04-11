@@ -1,14 +1,12 @@
-import 'package:dns_test_task/Network/NetworkService.dart';
-import 'package:dns_test_task/Screens/SendingDataScreen.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
+import '../Screens/SendingDataScreen.dart';
 import '../Models/UserDataForRegistration.dart';
 import '../Models/PhoneTextInputFormatter.dart';
 import '../Models/ValidateForm.dart';
-import '../Models/ServerResponse.dart';
-import '../Network/NetworkService.dart';
 import '../Models/ScreenArguments.dart';
+import '../Models/ServerResponse.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -32,6 +30,7 @@ class RegisterScreenState extends State<RegisterScreen> {
   final _focusPhone = FocusNode();
 
   bool _showButton = false;
+  bool _isLoading = false;
 
   void _updateButton() {
     setState(() {
@@ -59,25 +58,33 @@ class RegisterScreenState extends State<RegisterScreen> {
             ),
           ),
         ),
-        body: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
-              child: Column(
-                children: [
-                  _firstNameForm(),
-                  _indent(),
-                  _lastNameForm(),
-                  _indent(),
-                  _emailForm(),
-                  _indent(),
-                  _phoneForm(),
-                ],
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 5,
+                  valueColor:
+                  AlwaysStoppedAnimation
+                  (Theme.of(context).primaryColor),),
+              )
+            : SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
+                    child: Column(
+                      children: [
+                        _firstNameForm(),
+                        _indent(),
+                        _lastNameForm(),
+                        _indent(),
+                        _emailForm(),
+                        _indent(),
+                        _phoneForm(),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
         bottomNavigationBar: _bottomButton(context),
       ),
     );
@@ -167,7 +174,7 @@ class RegisterScreenState extends State<RegisterScreen> {
         _mobileFormatter,
       ],
       onFieldSubmitted: (v) {
-        if (_showButton) _buttonPressed(_formKey);
+        if (_showButton) _buttonPressed();
       },
     );
   }
@@ -188,7 +195,7 @@ class RegisterScreenState extends State<RegisterScreen> {
           child: RaisedButton(
             onPressed: _showButton
                 ? () {
-                    _buttonPressed(_formKey);
+                    _buttonPressed();
                   }
                 : null,
             child: Text(
@@ -200,21 +207,30 @@ class RegisterScreenState extends State<RegisterScreen> {
         ));
   }
 
-  void _buttonPressed(GlobalKey<FormState> _formKey) {
+  void _buttonPressed() {
     if (_formKey.currentState.validate()) {
-      UserDataForRegistration user = new UserDataForRegistration(
+      setState(() {
+        _isLoading = true;
+      });
+      
+      final RegExp exp = RegExp(r"[^0-9]");
+      final UserDataForRegistration user = new UserDataForRegistration(
           firstName: _firstNameController.text,
           lastName: _lastNameController.text,
           email: _emailController.text,
-          phone: _phoneController.text);
+          phone: _phoneController.text.replaceAll(exp, ''));
 
       _getToken(user);
+      
     }
   }
 
   void _getToken(UserDataForRegistration user) async {
-    var json = await NetworkService().getToken(user);
-    var response = ServerResponse.fromJson(json);
+    final ServerResponse response = await user.getToken(user);
+
+    setState(() {
+        _isLoading = false;
+      });
 
     if (response.code == 0) {
       Navigator.pushNamed(
@@ -225,6 +241,43 @@ class RegisterScreenState extends State<RegisterScreen> {
           response.data,
         ),
       );
+    } else {
+      _showDialog(response);
     }
+  }
+
+  void _showDialog(ServerResponse response) {
+    showDialog(
+        context: context,
+        builder: (BuildContext context) {
+          return AlertDialog(
+            title: Column(
+              children: [
+                Icon(
+                  Icons.warning,
+                  size: 100,
+                  color: Theme.of(context).primaryColor,
+                ),
+                Text(
+                  'Что-то пошло не так',
+                  textAlign: TextAlign.center,
+                ),
+              ],
+            ),
+            content: Text(response.message),
+            actions: [
+              FlatButton(
+                child: Text('ОК',
+                style: TextStyle(fontSize: 14, color: Colors.white),
+                ),
+                color: Theme.of(context).primaryColor,
+                onPressed: () {
+                  Navigator.of(context).pop();
+                },
+              )
+            ],
+          );
+        },
+      );
   }
 }

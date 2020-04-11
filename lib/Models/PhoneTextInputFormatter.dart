@@ -9,30 +9,6 @@ class PhoneTextInputFormatter extends TextInputFormatter {
     int selectionIndex = newValue.selection.end;
     int usedSubstringIndex = 0;
     final StringBuffer newText = StringBuffer();
-    //-------------------
-    // MARK: Удалить
-    //-------------------
-
-    /*if (newTextLength >= 1) {
-      newText.write('+7 (');
-      if (newValue.selection.end >= 1) {
-        selectionIndex += 4;
-      }
-    }
-
-    if (newTextLength >= 4) {
-      newText.write(newValue.text.substring(0, usedSubstringIndex = 3) + ') ');
-      if (newValue.selection.end >= 3) selectionIndex += 2;
-    }
-
-    if (newTextLength >= 7) {
-      newText.write(newValue.text.substring(3, usedSubstringIndex = 6) + '-');
-      if (newValue.selection.end >= 6) selectionIndex++;
-    }
-    if (newTextLength >= 9) {
-      newText.write(newValue.text.substring(6, usedSubstringIndex = 8) + '-');
-      if (newValue.selection.end >= 8) selectionIndex++;
-    }*/
 
     if (newTextLength >= 1) {
       newText.write(newValue.text.substring(0, usedSubstringIndex = 1));

@@ -1,9 +1,8 @@
-import 'package:dns_test_task/Models/FullUserData.dart';
 import 'package:flutter/material.dart';
-import '../Network/NetworkService.dart';
 import '../Models/ScreenArguments.dart';
 import '../Models/ServerResponse.dart';
 import '../Models/ValidateForm.dart';
+import '../Models/FullUserData.dart';
 
 class SendingDataScreen extends StatefulWidget {
   @override
@@ -23,6 +22,7 @@ class SendingDataScreenState extends State<SendingDataScreen> {
   final ValidateForm _validateForm = ValidateForm();
 
   bool _showButton = false;
+  bool _isLoading = false;
 
   void _updateButton() {
     setState(() {
@@ -50,23 +50,31 @@ class SendingDataScreenState extends State<SendingDataScreen> {
               ),
             ),
             iconTheme: IconThemeData(
-              color: Colors.white, //change your color here
+              color: Colors.white,
             )),
-        body: SingleChildScrollView(
-          child: Form(
-            key: _formKey,
-            child: Container(
-              margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
-              child: Column(
-                children: [
-                  _gihubURLForm(),
-                  SizedBox(height: 29),
-                  _summaryURLForm(arguments),
-                ],
+        body: _isLoading
+            ? Center(
+                child: CircularProgressIndicator(
+                  strokeWidth: 5,
+                  valueColor:
+                      AlwaysStoppedAnimation(Theme.of(context).primaryColor),
+                ),
+              )
+            : SingleChildScrollView(
+                child: Form(
+                  key: _formKey,
+                  child: Container(
+                    margin: const EdgeInsets.fromLTRB(16, 23, 16, 23),
+                    child: Column(
+                      children: [
+                        _gihubURLForm(),
+                        SizedBox(height: 29),
+                        _summaryURLForm(arguments),
+                      ],
+                    ),
+                  ),
+                ),
               ),
-            ),
-          ),
-        ),
         bottomNavigationBar: _bottomButton(arguments),
       ),
     );
@@ -107,27 +115,55 @@ class SendingDataScreenState extends State<SendingDataScreen> {
         ),
         validator: _validateForm.validateURL,
         onFieldSubmitted: (v) {
-          if (_showButton) _registerButton(arguments, context);
+          if (_showButton) _registerButton(arguments);
         });
   }
 
-  void _registerButton(ScreenArguments arguments, BuildContext context) {
-    final FullUserData user = FullUserData(
+  Widget _bottomButton(ScreenArguments arguments) {
+    return Container(
+        height: 36,
+        width: 160,
+        margin: const EdgeInsets.only(bottom: 45),
+        child: Align(
+          alignment: Alignment.bottomCenter,
+          child: RaisedButton(
+            onPressed: _showButton
+                ? () {
+                    _registerButton(arguments);
+                  }
+                : null,
+            child: Text(
+              'ЗАРЕГИСТРИРОВАТЬСЯ',
+              style: TextStyle(fontSize: 14, color: Colors.white),
+            ),
+            color: Theme.of(context).primaryColor,
+          ),
+        ));
+  }
+
+  void _registerButton(ScreenArguments arguments) {
+    if (_formKey.currentState.validate()) {
+      setState(() {
+        _isLoading = true;
+      });
+      final FullUserData user = FullUserData(
         user: arguments.user,
         githubProfileUrl: _githubProfileUrlController.text,
-        summaryUrl: _summaryUrlController.text);
-
-    _register(context, user, arguments);
+        summaryUrl: _summaryUrlController.text,
+      );
+      _register(user, arguments);
+    }
   }
 
-  void _register(BuildContext context, FullUserData user,
-      ScreenArguments arguments) async {
-    var json = await NetworkService().registerCandidate(user, arguments.token);
-    var response = ServerResponse.fromJson(json);
-    _showDialog(context, response);
+  void _register(FullUserData user, ScreenArguments arguments) async {
+    final response = await user.register(arguments.token, user);
+    setState(() {
+      _isLoading = false;
+    });
+    _showDialog(response);
   }
 
-  void _showDialog(BuildContext context, ServerResponse response) {
+  void _showDialog(ServerResponse response) {
     if (response.code == 0) {
       showDialog(
         context: context,
@@ -140,10 +176,14 @@ class SendingDataScreenState extends State<SendingDataScreen> {
             content: Icon(
               Icons.done,
               size: 100,
+              color: Theme.of(context).primaryColor,
             ),
             actions: [
               FlatButton(
-                child: Text('ОК'),
+                child: Text('ОК',
+                style: TextStyle(fontSize: 14, color: Colors.white),
+                ),
+                color: Theme.of(context).primaryColor,
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -162,6 +202,7 @@ class SendingDataScreenState extends State<SendingDataScreen> {
                 Icon(
                   Icons.warning,
                   size: 100,
+                  color: Theme.of(context).primaryColor,
                 ),
                 Text(
                   'Что-то пошло не так',
@@ -172,7 +213,10 @@ class SendingDataScreenState extends State<SendingDataScreen> {
             content: Text(response.message),
             actions: [
               FlatButton(
-                child: Text('ОК'),
+                child: Text('ОК',
+                style: TextStyle(fontSize: 14, color: Colors.white),
+                ),
+                color: Theme.of(context).primaryColor,
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -182,27 +226,5 @@ class SendingDataScreenState extends State<SendingDataScreen> {
         },
       );
     }
-  }
-
-  Widget _bottomButton(ScreenArguments arguments) {
-    return Container(
-        height: 36,
-        width: 160,
-        margin: const EdgeInsets.only(bottom: 45),
-        child: Align(
-          alignment: Alignment.bottomCenter,
-          child: RaisedButton(
-            onPressed: _showButton
-                ? () {
-                    _registerButton(arguments, context);
-                  }
-                : null,
-            child: Text(
-              'ЗАРЕГИСТРИРОВАТЬСЯ',
-              style: TextStyle(fontSize: 14, color: Colors.white),
-            ),
-            color: Theme.of(context).primaryColor,
-          ),
-        ));
   }
 }
