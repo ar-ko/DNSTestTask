@@ -34,7 +34,10 @@ class FullUserData extends User {
       user: user,
     );
     final Map<String, dynamic> json = await networkHelper.getData();
-    final ServerResponse response = ServerResponse.fromJson(json);
-    return response;
+    if (json != null) {
+      final ServerResponse response = ServerResponse.fromJson(json);
+      return response;
+    }
+    return null;
   }
 }

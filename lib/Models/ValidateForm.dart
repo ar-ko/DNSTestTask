@@ -45,7 +45,7 @@ class ValidateForm {
   }
 
   String validateURL(String value) {
-    Pattern pattern = r'(http(s)?)(:(\/\/)?).+';
+    Pattern pattern = r'(http(s)?)(:(\/\/)).+';
     RegExp regex = new RegExp(pattern);
     if (!regex.hasMatch(value) && value.isNotEmpty) {
       return 'Введите корректную ссылку на резюме';

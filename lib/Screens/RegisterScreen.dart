@@ -63,8 +63,8 @@ class RegisterScreenState extends State<RegisterScreen> {
                 child: CircularProgressIndicator(
                   strokeWidth: 5,
                   valueColor:
-                  AlwaysStoppedAnimation
-                  (Theme.of(context).primaryColor),),
+                      AlwaysStoppedAnimation(Theme.of(context).primaryColor),
+                ),
               )
             : SingleChildScrollView(
                 child: Form(
@@ -170,6 +170,7 @@ class RegisterScreenState extends State<RegisterScreen> {
       ),
       validator: _validateForm.validateMobile,
       inputFormatters: <TextInputFormatter>[
+        LengthLimitingTextInputFormatter(17),
         WhitelistingTextInputFormatter.digitsOnly,
         _mobileFormatter,
       ],
@@ -212,7 +213,7 @@ class RegisterScreenState extends State<RegisterScreen> {
       setState(() {
         _isLoading = true;
       });
-      
+
       final RegExp exp = RegExp(r"[^0-9]");
       final UserDataForRegistration user = new UserDataForRegistration(
           firstName: _firstNameController.text,
@@ -221,7 +222,6 @@ class RegisterScreenState extends State<RegisterScreen> {
           phone: _phoneController.text.replaceAll(exp, ''));
 
       _getToken(user);
-      
     }
   }
 
@@ -229,55 +229,62 @@ class RegisterScreenState extends State<RegisterScreen> {
     final ServerResponse response = await user.getToken(user);
 
     setState(() {
-        _isLoading = false;
-      });
-
-    if (response.code == 0) {
-      Navigator.pushNamed(
-        context,
-        SendingDataScreenState.routeName,
-        arguments: ScreenArguments(
-          user,
-          response.data,
-        ),
-      );
+      _isLoading = false;
+    });
+    if (response != null) {
+      if (response.code == 0) {
+        Navigator.pushNamed(
+          context,
+          SendingDataScreenState.routeName,
+          arguments: ScreenArguments(
+            user,
+            response.data,
+          ),
+        );
+      }
     } else {
       _showDialog(response);
     }
   }
 
   void _showDialog(ServerResponse response) {
+    String message;
+    if (response == null)
+      message = 'Отсутствует соединение с Интеренетом';
+    else
+      message = response.message;
     showDialog(
-        context: context,
-        builder: (BuildContext context) {
-          return AlertDialog(
-            title: Column(
-              children: [
-                Icon(
-                  Icons.warning,
-                  size: 100,
-                  color: Theme.of(context).primaryColor,
-                ),
-                Text(
-                  'Что-то пошло не так',
-                  textAlign: TextAlign.center,
-                ),
-              ],
-            ),
-            content: Text(response.message),
-            actions: [
-              FlatButton(
-                child: Text('ОК',
-                style: TextStyle(fontSize: 14, color: Colors.white),
-                ),
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Column(
+            children: [
+              Icon(
+                Icons.warning,
+                size: 100,
                 color: Theme.of(context).primaryColor,
-                onPressed: () {
-                  Navigator.of(context).pop();
-                },
-              )
+              ),
+              Text(
+                'Что-то пошло не так',
+                textAlign: TextAlign.center,
+              ),
             ],
-          );
-        },
-      );
+          ),
+          content: Text(message),
+          actions: [
+            FlatButton(
+              child: Text(
+                'ОК',
+                style: TextStyle(fontSize: 14, color: Colors.white),
+              ),
+              color: Theme.of(context).primaryColor,
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            )
+          ],
+        );
+      },
+    );
   }
 }

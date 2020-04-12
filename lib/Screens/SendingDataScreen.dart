@@ -164,7 +164,13 @@ class SendingDataScreenState extends State<SendingDataScreen> {
   }
 
   void _showDialog(ServerResponse response) {
-    if (response.code == 0) {
+    String message;
+    if (response == null)
+      message = 'Отсутствует соединение с Интеренетом';
+    else
+      message = response.message;
+
+    if (response != null && response.code == 0) {
       showDialog(
         context: context,
         builder: (BuildContext context) {
@@ -180,8 +186,9 @@ class SendingDataScreenState extends State<SendingDataScreen> {
             ),
             actions: [
               FlatButton(
-                child: Text('ОК',
-                style: TextStyle(fontSize: 14, color: Colors.white),
+                child: Text(
+                  'ОК',
+                  style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
                 color: Theme.of(context).primaryColor,
                 onPressed: () {
@@ -206,15 +213,17 @@ class SendingDataScreenState extends State<SendingDataScreen> {
                 ),
                 Text(
                   'Что-то пошло не так',
+                  style: TextStyle(fontSize: 18, color: Colors.black),
                   textAlign: TextAlign.center,
                 ),
               ],
             ),
-            content: Text(response.message),
+            content: Text(message),
             actions: [
               FlatButton(
-                child: Text('ОК',
-                style: TextStyle(fontSize: 14, color: Colors.white),
+                child: Text(
+                  'ОК',
+                  style: TextStyle(fontSize: 14, color: Colors.white),
                 ),
                 color: Theme.of(context).primaryColor,
                 onPressed: () {
