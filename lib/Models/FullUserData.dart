@@ -29,7 +29,7 @@ class FullUserData extends User {
 
   Future register(String token, FullUserData user) async {
     final NetworkHelper networkHelper = NetworkHelper(
-      url: 'https://vacancy.dns-shop.ru/api/candidate/test/summary',
+      url: 'https://vacancy.dns-shop.ru/api/candidate/summary',
       token: token,
       user: user,
     );
