@@ -1,7 +1,7 @@
-import '../Models/UserDataForRegistration.dart';
-import '../Models/User.dart';
-import '../Network/NetworkService.dart';
-import '../Models/ServerResponse.dart';
+import '../models/user_data_for_registration.dart';
+import '../models/user.dart';
+import '../network/network_helper.dart';
+import '../models/server_response.dart';
 
 class FullUserData extends User {
   final String githubProfileUrl;
@@ -27,11 +27,11 @@ class FullUserData extends User {
         'summary': summaryUrl,
       };
 
-  Future register(String token, FullUserData user) async {
+  Future register(String token) async {
     final NetworkHelper networkHelper = NetworkHelper(
       url: 'https://vacancy.dns-shop.ru/api/candidate/summary',
       token: token,
-      user: user,
+      user: this,
     );
     final Map<String, dynamic> json = await networkHelper.getData();
     if (json != null) {

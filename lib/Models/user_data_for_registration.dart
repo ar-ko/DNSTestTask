@@ -1,6 +1,6 @@
-import '../Network/NetworkService.dart';
-import '../Models/ServerResponse.dart';
-import '../Models/User.dart';
+import '../network/network_helper.dart';
+import '../models/server_response.dart';
+import '../models/user.dart';
 
 class UserDataForRegistration extends User {
   UserDataForRegistration({
@@ -11,7 +11,7 @@ class UserDataForRegistration extends User {
   }) : super(
           firstName: firstName,
           lastName: lastName,
-          phone: phone,
+          phone: phone.replaceAll(RegExp(r"[^0-9]"), ''),
           email: email,
         );
 
@@ -22,11 +22,11 @@ class UserDataForRegistration extends User {
         'email': email,
       };
 
-  Future getToken(UserDataForRegistration user) async {
+  Future getToken() async {
     final NetworkHelper networkHelper = NetworkHelper(
       url: 'https://vacancy.dns-shop.ru/api/candidate/token',
       token: null,
-      user: user,
+      user: this,
     );
     final Map<String, dynamic> json = await networkHelper.getData();
     if (json != null) {

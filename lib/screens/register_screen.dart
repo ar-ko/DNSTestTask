@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../Screens/SendingDataScreen.dart';
-import '../Models/UserDataForRegistration.dart';
-import '../Models/PhoneTextInputFormatter.dart';
-import '../Models/ValidateForm.dart';
-import '../Models/ScreenArguments.dart';
-import '../Models/ServerResponse.dart';
+import '../screens/sending_data_screen.dart';
+import '../models/user_data_for_registration.dart';
+import '../models/phone_text_input_formatter.dart';
+import '../models/validate_form.dart';
+import '../models/screen_arguments.dart';
+import '../models/server_response.dart';
+import '../constants.dart';
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -99,9 +100,10 @@ class RegisterScreenState extends State<RegisterScreen> {
       controller: _firstNameController,
       keyboardType: TextInputType.text,
       textCapitalization: TextCapitalization.sentences,
+      style: kTextFormStyle,
       decoration: const InputDecoration(
         hintText: 'Имя',
-        hintStyle: TextStyle(fontSize: 16),
+        hintStyle: kHintTextFormStyle,
       ),
       validator: _validateForm.validateFirsttName,
       textInputAction: TextInputAction.next,
@@ -121,9 +123,10 @@ class RegisterScreenState extends State<RegisterScreen> {
       controller: _lastNameController,
       keyboardType: TextInputType.text,
       textCapitalization: TextCapitalization.sentences,
+      style: kTextFormStyle,
       decoration: const InputDecoration(
         hintText: 'Фамилия',
-        hintStyle: TextStyle(fontSize: 16),
+        hintStyle: kHintTextFormStyle,
       ),
       validator: _validateForm.validateLastName,
       textInputAction: TextInputAction.next,
@@ -142,9 +145,10 @@ class RegisterScreenState extends State<RegisterScreen> {
       autovalidate: true,
       controller: _emailController,
       keyboardType: TextInputType.emailAddress,
+      style: kTextFormStyle,
       decoration: const InputDecoration(
         hintText: 'E-mail',
-        hintStyle: TextStyle(fontSize: 16),
+        hintStyle: kHintTextFormStyle,
       ),
       validator: _validateForm.validateEmail,
       textInputAction: TextInputAction.next,
@@ -164,9 +168,10 @@ class RegisterScreenState extends State<RegisterScreen> {
       controller: _phoneController,
       textCapitalization: TextCapitalization.sentences,
       keyboardType: TextInputType.phone,
+      style: kTextFormStyle,
       decoration: const InputDecoration(
         hintText: 'Телефон',
-        hintStyle: TextStyle(fontSize: 16),
+        hintStyle: kHintTextFormStyle,
       ),
       validator: _validateForm.validateMobile,
       inputFormatters: <TextInputFormatter>[
@@ -201,7 +206,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                 : null,
             child: Text(
               'ПОЛУЧИТЬ КЛЮЧ',
-              style: TextStyle(fontSize: 14, color: Colors.white),
+              style: kButtonTextStyle,
             ),
             color: Theme.of(context).primaryColor,
           ),
@@ -214,19 +219,19 @@ class RegisterScreenState extends State<RegisterScreen> {
         _isLoading = true;
       });
 
-      final RegExp exp = RegExp(r"[^0-9]");
       final UserDataForRegistration user = new UserDataForRegistration(
           firstName: _firstNameController.text,
           lastName: _lastNameController.text,
           email: _emailController.text,
-          phone: _phoneController.text.replaceAll(exp, ''));
+          phone: _phoneController.text);
 
+      print(user.phone);
       _getToken(user);
     }
   }
 
   void _getToken(UserDataForRegistration user) async {
-    final ServerResponse response = await user.getToken(user);
+    final ServerResponse response = await user.getToken();
 
     setState(() {
       _isLoading = false;
@@ -275,7 +280,7 @@ class RegisterScreenState extends State<RegisterScreen> {
             FlatButton(
               child: Text(
                 'ОК',
-                style: TextStyle(fontSize: 14, color: Colors.white),
+                style: kAlertButtonTextStyle,
               ),
               color: Theme.of(context).primaryColor,
               onPressed: () {

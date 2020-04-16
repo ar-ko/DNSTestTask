@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
-import 'Screens/SendingDataScreen.dart';
-import 'Screens/RegisterScreen.dart';
+import 'screens/sending_data_screen.dart';
+import 'screens/register_screen.dart';
 
 void main() => runApp(DNSTestTask());
 

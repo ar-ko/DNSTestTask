@@ -1,4 +1,4 @@
-import '../Models/UserDataForRegistration.dart';
+import '../models/user_data_for_registration.dart';
 
 class ScreenArguments {
   final UserDataForRegistration user;

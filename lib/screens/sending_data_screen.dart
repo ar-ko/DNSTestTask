@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
-import '../Models/ScreenArguments.dart';
-import '../Models/ServerResponse.dart';
-import '../Models/ValidateForm.dart';
-import '../Models/FullUserData.dart';
+import '../models/screen_arguments.dart';
+import '../models/server_response.dart';
+import '../models/validate_form.dart';
+import '../models/full_user_data.dart';
+import '../constants.dart';
 
 class SendingDataScreen extends StatefulWidget {
   @override
@@ -89,9 +90,10 @@ class SendingDataScreenState extends State<SendingDataScreen> {
         controller: _githubProfileUrlController,
         textCapitalization: TextCapitalization.none,
         keyboardType: TextInputType.text,
+        style: kTextFormStyle,
         decoration: const InputDecoration(
           hintText: 'Ссылка на github',
-          hintStyle: TextStyle(fontSize: 16),
+          hintStyle: kHintTextFormStyle,
         ),
         validator: _validateForm.validateGithub,
         textInputAction: TextInputAction.next,
@@ -109,9 +111,10 @@ class SendingDataScreenState extends State<SendingDataScreen> {
         focusNode: _focusSummaryUrl,
         controller: _summaryUrlController,
         textCapitalization: TextCapitalization.none,
+        style: kTextFormStyle,
         decoration: const InputDecoration(
           hintText: 'Ссылка на резюме',
-          hintStyle: TextStyle(fontSize: 16),
+          hintStyle: kHintTextFormStyle,
         ),
         validator: _validateForm.validateURL,
         onFieldSubmitted: (v) {
@@ -134,7 +137,7 @@ class SendingDataScreenState extends State<SendingDataScreen> {
                 : null,
             child: Text(
               'ЗАРЕГИСТРИРОВАТЬСЯ',
-              style: TextStyle(fontSize: 14, color: Colors.white),
+              style: kButtonTextStyle,
             ),
             color: Theme.of(context).primaryColor,
           ),
@@ -156,7 +159,7 @@ class SendingDataScreenState extends State<SendingDataScreen> {
   }
 
   void _register(FullUserData user, ScreenArguments arguments) async {
-    final response = await user.register(arguments.token, user);
+    final response = await user.register(arguments.token);
     setState(() {
       _isLoading = false;
     });
@@ -188,7 +191,7 @@ class SendingDataScreenState extends State<SendingDataScreen> {
               FlatButton(
                 child: Text(
                   'ОК',
-                  style: TextStyle(fontSize: 14, color: Colors.white),
+                  style: kAlertButtonTextStyle,
                 ),
                 color: Theme.of(context).primaryColor,
                 onPressed: () {
@@ -223,7 +226,7 @@ class SendingDataScreenState extends State<SendingDataScreen> {
               FlatButton(
                 child: Text(
                   'ОК',
-                  style: TextStyle(fontSize: 14, color: Colors.white),
+                  style: kAlertButtonTextStyle,
                 ),
                 color: Theme.of(context).primaryColor,
                 onPressed: () {
