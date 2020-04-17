@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
+
+import '../constants.dart';
+import '../models/full_user_data.dart';
 import '../models/screen_arguments.dart';
 import '../models/server_response.dart';
 import '../models/validate_form.dart';
-import '../models/full_user_data.dart';
-import '../constants.dart';
 
 class SendingDataScreen extends StatefulWidget {
   @override
@@ -35,30 +36,30 @@ class SendingDataScreenState extends State<SendingDataScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final ScreenArguments arguments = ModalRoute.of(context).settings.arguments;
+    final ScreenArguments arguments =
+        ModalRoute.of(context).settings.arguments as ScreenArguments;
 
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        FocusScope.of(context).requestFocus(new FocusNode());
+        FocusScope.of(context).requestFocus(FocusNode());
       },
       child: Scaffold(
         appBar: AppBar(
-            title: Text(
+            title: const Text(
               'Отправка данных',
               style: TextStyle(
-                color: Colors.white,
+                color: kAppBarTextColor,
               ),
             ),
-            iconTheme: IconThemeData(
+            iconTheme: const IconThemeData(
               color: Colors.white,
             )),
         body: _isLoading
             ? Center(
                 child: CircularProgressIndicator(
                   strokeWidth: 5,
-                  valueColor:
-                      AlwaysStoppedAnimation(Theme.of(context).primaryColor),
+                  valueColor: AlwaysStoppedAnimation(kMainColor),
                 ),
               )
             : SingleChildScrollView(
@@ -69,7 +70,7 @@ class SendingDataScreenState extends State<SendingDataScreen> {
                     child: Column(
                       children: [
                         _gihubURLForm(),
-                        SizedBox(height: 29),
+                        const SizedBox(height: 29),
                         _summaryURLForm(arguments),
                       ],
                     ),
@@ -139,7 +140,7 @@ class SendingDataScreenState extends State<SendingDataScreen> {
               'ЗАРЕГИСТРИРОВАТЬСЯ',
               style: kButtonTextStyle,
             ),
-            color: Theme.of(context).primaryColor,
+            color: kMainColor,
           ),
         ));
   }
@@ -159,7 +160,8 @@ class SendingDataScreenState extends State<SendingDataScreen> {
   }
 
   void _register(FullUserData user, ScreenArguments arguments) async {
-    final response = await user.register(arguments.token);
+    final ServerResponse response =
+        await user.register(arguments.token) as ServerResponse;
     setState(() {
       _isLoading = false;
     });
@@ -168,32 +170,34 @@ class SendingDataScreenState extends State<SendingDataScreen> {
 
   void _showDialog(ServerResponse response) {
     String message;
-    if (response == null)
+    if (response == null) {
       message = 'Отсутствует соединение с Интеренетом';
-    else
+    } else {
       message = response.message;
+    }
 
     if (response != null && response.code == 0) {
-      showDialog(
+      showDialog<dynamic>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
-            title: Text(
+            title: const Text(
               'Заявка успешно отправлена',
+              style: kAlertTitleTextStyle,
               textAlign: TextAlign.center,
             ),
             content: Icon(
               Icons.done,
               size: 100,
-              color: Theme.of(context).primaryColor,
+              color: kMainColor,
             ),
             actions: [
               FlatButton(
-                child: Text(
+                child: const Text(
                   'ОК',
                   style: kAlertButtonTextStyle,
                 ),
-                color: Theme.of(context).primaryColor,
+                color: kMainColor,
                 onPressed: () {
                   Navigator.of(context).pop();
                 },
@@ -203,7 +207,7 @@ class SendingDataScreenState extends State<SendingDataScreen> {
         },
       );
     } else {
-      showDialog(
+      showDialog<dynamic>(
         context: context,
         builder: (BuildContext context) {
           return AlertDialog(
@@ -212,11 +216,11 @@ class SendingDataScreenState extends State<SendingDataScreen> {
                 Icon(
                   Icons.warning,
                   size: 100,
-                  color: Theme.of(context).primaryColor,
+                  color: kMainColor,
                 ),
-                Text(
+                const Text(
                   'Что-то пошло не так',
-                  style: TextStyle(fontSize: 18, color: Colors.black),
+                  style: kAlertTitleTextStyle,
                   textAlign: TextAlign.center,
                 ),
               ],
@@ -224,11 +228,11 @@ class SendingDataScreenState extends State<SendingDataScreen> {
             content: Text(message),
             actions: [
               FlatButton(
-                child: Text(
+                child: const Text(
                   'ОК',
                   style: kAlertButtonTextStyle,
                 ),
-                color: Theme.of(context).primaryColor,
+                color: kMainColor,
                 onPressed: () {
                   Navigator.of(context).pop();
                 },

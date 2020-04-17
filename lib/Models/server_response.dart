@@ -6,7 +6,7 @@ class ServerResponse {
   final String data;
 
   ServerResponse.fromJson(Map<String, dynamic> json)
-      : code = json['code'],
-        message = json['message'],
-        data = json['data'];
+      : code = json['code'] as int,
+        message = json['message'] as String,
+        data = json['data'] as String;
 }

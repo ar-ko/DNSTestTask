@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
-import 'screens/sending_data_screen.dart';
+
+import 'constants.dart';
 import 'screens/register_screen.dart';
+import 'screens/sending_data_screen.dart';
+
 
 void main() => runApp(DNSTestTask());
 
@@ -9,7 +12,7 @@ class DNSTestTask extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
         theme: ThemeData(
-          primaryColor: Color(0xffED8E00),
+          primaryColor: kMainColor,
         ),
         home: RegisterScreen(),
         routes: {

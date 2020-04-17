@@ -1,13 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 
-import '../screens/sending_data_screen.dart';
-import '../models/user_data_for_registration.dart';
+import '../constants.dart';
 import '../models/phone_text_input_formatter.dart';
-import '../models/validate_form.dart';
 import '../models/screen_arguments.dart';
 import '../models/server_response.dart';
-import '../constants.dart';
+import '../models/user_data_for_registration.dart';
+import '../models/validate_form.dart';
+import '../screens/sending_data_screen.dart';
+
 
 class RegisterScreen extends StatefulWidget {
   @override
@@ -48,14 +49,14 @@ class RegisterScreenState extends State<RegisterScreen> {
     return GestureDetector(
       behavior: HitTestBehavior.opaque,
       onTap: () {
-        FocusScope.of(context).requestFocus(new FocusNode());
+        FocusScope.of(context).requestFocus(FocusNode());
       },
       child: Scaffold(
         appBar: AppBar(
           title: Text(
             'Ввод данных',
             style: TextStyle(
-              color: Colors.white,
+              color: kAppBarTextColor,
             ),
           ),
         ),
@@ -64,7 +65,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                 child: CircularProgressIndicator(
                   strokeWidth: 5,
                   valueColor:
-                      AlwaysStoppedAnimation(Theme.of(context).primaryColor),
+                      AlwaysStoppedAnimation(kMainColor),
                 ),
               )
             : SingleChildScrollView(
@@ -105,7 +106,7 @@ class RegisterScreenState extends State<RegisterScreen> {
         hintText: 'Имя',
         hintStyle: kHintTextFormStyle,
       ),
-      validator: _validateForm.validateFirsttName,
+      validator: _validateForm.validateFirstName,
       textInputAction: TextInputAction.next,
       onFieldSubmitted: (v) {
         FocusScope.of(context).requestFocus(_focusLastName);
@@ -186,7 +187,7 @@ class RegisterScreenState extends State<RegisterScreen> {
   }
 
   Widget _indent() {
-    return SizedBox(
+    return const SizedBox(
       height: 28,
     );
   }
@@ -200,15 +201,13 @@ class RegisterScreenState extends State<RegisterScreen> {
           alignment: Alignment.bottomCenter,
           child: RaisedButton(
             onPressed: _showButton
-                ? () {
-                    _buttonPressed();
-                  }
+                ? _buttonPressed
                 : null,
             child: Text(
               'ПОЛУЧИТЬ КЛЮЧ',
               style: kButtonTextStyle,
             ),
-            color: Theme.of(context).primaryColor,
+            color: kMainColor
           ),
         ));
   }
@@ -219,26 +218,25 @@ class RegisterScreenState extends State<RegisterScreen> {
         _isLoading = true;
       });
 
-      final UserDataForRegistration user = new UserDataForRegistration(
+      final UserDataForRegistration user = UserDataForRegistration(
           firstName: _firstNameController.text,
           lastName: _lastNameController.text,
           email: _emailController.text,
           phone: _phoneController.text);
 
-      print(user.phone);
       _getToken(user);
     }
   }
 
   void _getToken(UserDataForRegistration user) async {
-    final ServerResponse response = await user.getToken();
+    final ServerResponse response = (await user.getToken()) as ServerResponse;
 
     setState(() {
       _isLoading = false;
     });
     if (response != null) {
       if (response.code == 0) {
-        Navigator.pushNamed(
+        await Navigator.pushNamed(
           context,
           SendingDataScreenState.routeName,
           arguments: ScreenArguments(
@@ -254,11 +252,12 @@ class RegisterScreenState extends State<RegisterScreen> {
 
   void _showDialog(ServerResponse response) {
     String message;
-    if (response == null)
+    if (response == null) {
       message = 'Отсутствует соединение с Интеренетом';
-    else
+    } else {
       message = response.message;
-    showDialog(
+    }
+    showDialog<dynamic>(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
@@ -267,10 +266,11 @@ class RegisterScreenState extends State<RegisterScreen> {
               Icon(
                 Icons.warning,
                 size: 100,
-                color: Theme.of(context).primaryColor,
+                color: kMainColor,
               ),
-              Text(
+              const Text(
                 'Что-то пошло не так',
+                style: kAlertTitleTextStyle,
                 textAlign: TextAlign.center,
               ),
             ],
@@ -282,7 +282,7 @@ class RegisterScreenState extends State<RegisterScreen> {
                 'ОК',
                 style: kAlertButtonTextStyle,
               ),
-              color: Theme.of(context).primaryColor,
+              color: kMainColor,
               onPressed: () {
                 Navigator.of(context).pop();
               },

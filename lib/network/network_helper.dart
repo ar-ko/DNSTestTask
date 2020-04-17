@@ -1,6 +1,8 @@
-import '../models/user.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:http/http.dart' as http;
+
+import '../models/user.dart';
+
 
 class NetworkHelper {
   NetworkHelper({
@@ -9,12 +11,12 @@ class NetworkHelper {
     this.token,
   }) {
     if (token != null) {
-      this.headers = {
+      headers = {
         'Content-Type': 'application/json; charset=utf-8 ',
         'Authorization': 'Bearer $token',
       };
     } else {
-      this.headers = {
+      headers = {
         'Content-Type': 'application/json; charset=utf-8 ',
       };
     }

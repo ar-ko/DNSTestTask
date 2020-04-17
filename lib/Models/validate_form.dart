@@ -1,7 +1,7 @@
 
 
 class ValidateForm {
-  String validateFirsttName(String value) {
+  String validateFirstName(String value) {
     if (value.length < 2 && value.isNotEmpty) {
       return 'Введите свое имя';
     }
@@ -24,9 +24,9 @@ class ValidateForm {
   }
 
   String validateEmail(String value) {
-    Pattern pattern =
+    String pattern =
         r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$';
-    RegExp regex = new RegExp(pattern);
+    RegExp regex = RegExp(pattern);
     if (!regex.hasMatch(value) && value.isNotEmpty) {
       return 'Введите корректный email';
     } else {
@@ -35,8 +35,8 @@ class ValidateForm {
   }
 
   String validateGithub(String value) {
-    Pattern pattern = r'(http(s)?)(:(\/\/)?)(github\.com\/.+)';
-    RegExp regex = new RegExp(pattern);
+    String pattern = r'(http(s)?)(:(\/\/)?)(github\.com\/.+)';
+    RegExp regex = RegExp(pattern);
     if (!regex.hasMatch(value) && value.isNotEmpty) {
       return 'Введите корректную ссылку на github';
     } else {
@@ -45,8 +45,8 @@ class ValidateForm {
   }
 
   String validateURL(String value) {
-    Pattern pattern = r'(http(s)?)(:(\/\/)).+';
-    RegExp regex = new RegExp(pattern);
+    String pattern = r'(http(s)?)(:(\/\/)).+';
+    RegExp regex = RegExp(pattern);
     if (!regex.hasMatch(value) && value.isNotEmpty) {
       return 'Введите корректную ссылку на резюме';
     } else {
