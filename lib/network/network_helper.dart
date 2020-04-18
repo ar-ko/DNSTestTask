@@ -1,5 +1,7 @@
 import 'dart:convert';
+import 'dart:developer' as developer;
 import 'package:http/http.dart' as http;
+
 
 import '../models/user.dart';
 
@@ -38,10 +40,10 @@ class NetworkHelper {
       if (response.statusCode == 200) {
         return json.decode(utf8.decode(response.bodyBytes));
       } else {
-        print(response.statusCode);
+        developer.log('${response.statusCode}');
       }
-    } catch (err) {
-      print(err);
+    } catch(err) {
+      developer.log('$err');
       return null;
     }
   }
